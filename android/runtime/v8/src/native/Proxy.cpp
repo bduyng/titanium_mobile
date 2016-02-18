@@ -43,16 +43,16 @@ Proxy::Proxy(jobject javaProxy) :
 void Proxy::bindProxy(Local<Object> exports, Local<Context> context)
 {
 	Isolate* isolate = context->GetIsolate();
-	Local<String> javaClass = SYMBOL_LITERAL(isolate, "__javaClass__");
+	Local<String> javaClass = NEW_SYMBOL(isolate, "__javaClass__");
 	javaClassSymbol.Reset(isolate, javaClass);
-	constructorSymbol.Reset(isolate, SYMBOL_LITERAL(isolate, "constructor"));
-	inheritSymbol.Reset(isolate, SYMBOL_LITERAL(isolate, "inherit"));
-	propertiesSymbol.Reset(isolate, SYMBOL_LITERAL(isolate, "_properties"));
-	lengthSymbol.Reset(isolate, SYMBOL_LITERAL(isolate, "length"));
-	sourceUrlSymbol.Reset(isolate, SYMBOL_LITERAL(isolate, "sourceUrl"));
+	constructorSymbol.Reset(isolate, NEW_SYMBOL(isolate, "constructor"));
+	inheritSymbol.Reset(isolate, NEW_SYMBOL(isolate, "inherit"));
+	propertiesSymbol.Reset(isolate, NEW_SYMBOL(isolate, "_properties"));
+	lengthSymbol.Reset(isolate, NEW_SYMBOL(isolate, "length"));
+	sourceUrlSymbol.Reset(isolate, NEW_SYMBOL(isolate, "sourceUrl"));
 
 	Local<FunctionTemplate> proxyTemplate = FunctionTemplate::New(isolate);
-	Local<String> proxySymbol = SYMBOL_LITERAL(isolate, "Proxy");
+	Local<String> proxySymbol = NEW_SYMBOL(isolate, "Proxy");
 	proxyTemplate->InstanceTemplate()->SetInternalFieldCount(kInternalFieldCount);
 	proxyTemplate->SetClassName(proxySymbol);
 	proxyTemplate->Inherit(Local<FunctionTemplate>::New(isolate, EventEmitter::constructorTemplate));
@@ -73,7 +73,7 @@ static Local<Value> getPropertyForProxy(Isolate* isolate, Local<Name> property, 
 {
 	// Call getProperty on the Proxy to get the property.
 	// We define this method in JavaScript on the Proxy prototype.
-	Local<Value> getProperty = proxy->Get(FIXED_ONE_BYTE_STRING(isolate, "getProperty"));
+	Local<Value> getProperty = proxy->Get(STRING_NEW(isolate, "getProperty"));
 	if (!getProperty.IsEmpty() && getProperty->IsFunction()) {
 		Local<Value> argv[1] = { property };
 		return Local<Function>::Cast(getProperty)->Call(proxy, 1, argv);
@@ -111,7 +111,7 @@ void Proxy::getProperty(const v8::FunctionCallbackInfo<v8::Value>& args)
 static void setPropertyOnProxy(Isolate* isolate, Local<Name> property, Local<Value> value, Local<Object> proxy)
 {
 	// Call Proxy.prototype.setProperty.
-	Local<Value> setProperty = proxy->Get(FIXED_ONE_BYTE_STRING(isolate, "setProperty"));
+	Local<Value> setProperty = proxy->Get(STRING_NEW(isolate, "setProperty"));
 	if (!setProperty.IsEmpty() && setProperty->IsFunction()) {
 		Local<Value> argv[2] = { property, value };
 		Local<Function>::Cast(setProperty)->Call(proxy, 2, argv);
@@ -364,7 +364,7 @@ void Proxy::proxyConstructor(const v8::FunctionCallbackInfo<v8::Value>& args)
 		Local<String> constructorName = createProperties->GetConstructorName();
 		if (strcmp(*String::Utf8Value(constructorName), "Arguments") == 0) {
 			extend = false;
-			int32_t argsLength = createProperties->Get(FIXED_ONE_BYTE_STRING(isolate, "length"))->Int32Value();
+			int32_t argsLength = createProperties->Get(STRING_NEW(isolate, "length"))->Int32Value();
 			if (argsLength > 1) {
 				Local<Value> properties = createProperties->Get(1);
 				if (properties->IsObject()) {

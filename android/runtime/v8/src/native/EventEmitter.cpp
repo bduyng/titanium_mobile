@@ -40,11 +40,11 @@ void EventEmitter::initTemplate(Local<Context> context)
 	HandleScope scope(isolate);
 	Local<FunctionTemplate> constructor = FunctionTemplate::New(isolate, eventEmitterConstructor);
 	constructor->InstanceTemplate()->SetInternalFieldCount(1);
-	constructor->SetClassName(FIXED_ONE_BYTE_STRING(isolate, "EventEmitter"));
+	constructor->SetClassName(NEW_SYMBOL(isolate, "EventEmitter"));
 	constructorTemplate.Reset(isolate, constructor);
 
-	eventsSymbol.Reset(isolate, FIXED_ONE_BYTE_STRING(isolate, "_events"));
-	emitSymbol.Reset(isolate, FIXED_ONE_BYTE_STRING(isolate, "emit"));
+	eventsSymbol.Reset(isolate, NEW_SYMBOL(isolate, "_events"));
+	emitSymbol.Reset(isolate, NEW_SYMBOL(isolate, "emit"));
 }
 
 void EventEmitter::dispose()
@@ -59,7 +59,7 @@ bool EventEmitter::emit(Handle<String> event, int argc, Handle<Value> *argv)
 	Isolate* isolate = Isolate::GetCurrent();
 	HandleScope scope(isolate);
 
-	Local<Object> self = handle(); 
+	Local<Object> self = handle();
 
 	Local<Value> events_v = self->Get(eventsSymbol.Get(isolate));
 	if (!events_v->IsObject()) return false;
@@ -97,4 +97,3 @@ bool EventEmitter::emit(Handle<String> event, int argc, Handle<Value> *argv)
 }
 
 } // namespace titanium
-

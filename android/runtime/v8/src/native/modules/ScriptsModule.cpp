@@ -70,7 +70,7 @@ void WrappedScript::Initialize(Local<Object> target, Local<Context> context)
 
 	Local<FunctionTemplate> constructor = FunctionTemplate::New(isolate, WrappedScript::New);
 	constructor->InstanceTemplate()->SetInternalFieldCount(1);
-	Local<String> symbol = FIXED_ONE_BYTE_STRING(isolate, "Script");
+	Local<String> symbol = NEW_SYMBOL(isolate, "Script");
 	constructor->SetClassName(symbol);
 
 	constructor_template.Reset(isolate, constructor);
@@ -190,13 +190,13 @@ void WrappedScript::EvalMachine(const FunctionCallbackInfo<Value>& args)
 	HandleScope scope(isolate);
 
 	if (input_flag == compileCode && args.Length() < 1) {
-		isolate->ThrowException(Exception::TypeError(FIXED_ONE_BYTE_STRING(isolate, "needs at least 'code' argument.")));
+		isolate->ThrowException(Exception::TypeError(STRING_NEW(isolate, "needs at least 'code' argument.")));
 		return;
 	}
 
 	const int sandbox_index = input_flag == compileCode ? 1 : 0;
 	if (context_flag == userContext && args.Length() < (sandbox_index + 1)) {
-		isolate->ThrowException(Exception::TypeError(FIXED_ONE_BYTE_STRING(isolate, "needs a 'context' argument.")));
+		isolate->ThrowException(Exception::TypeError(STRING_NEW(isolate, "needs a 'context' argument.")));
 		return;
 	}
 
@@ -217,7 +217,7 @@ void WrappedScript::EvalMachine(const FunctionCallbackInfo<Value>& args)
 
 	const int filename_index = sandbox_index + filename_offset;
 	Local<String> filename =
-		args.Length() > filename_index ? args[filename_index]->ToString(isolate) : FIXED_ONE_BYTE_STRING(isolate, "evalmachine.<anonymous>");
+		args.Length() > filename_index ? args[filename_index]->ToString(isolate) : STRING_NEW(isolate, "evalmachine.<anonymous>");
 
 	const int display_error_index = args.Length() - 1;
 	bool display_error = false;
@@ -264,10 +264,10 @@ void WrappedScript::EvalMachine(const FunctionCallbackInfo<Value>& args)
 	} else {
 		WrappedScript *n_script = NativeObject::Unwrap<WrappedScript>(args.Holder());
 		if (!n_script) {
-			isolate->ThrowException(Exception::Error(FIXED_ONE_BYTE_STRING(isolate, "Must be called as a method of Script.")));
+			isolate->ThrowException(Exception::Error(STRING_NEW(isolate, "Must be called as a method of Script.")));
 			return;
 		} else if (n_script->script_.IsEmpty()) {
-			isolate->ThrowException(Exception::Error(FIXED_ONE_BYTE_STRING(isolate, "'this' must be a result of previous "
+			isolate->ThrowException(Exception::Error(STRING_NEW(isolate, "'this' must be a result of previous "
 				"new Script(code) call.")));
 			return;
 		}
@@ -289,7 +289,7 @@ void WrappedScript::EvalMachine(const FunctionCallbackInfo<Value>& args)
 	} else {
 		WrappedScript *n_script = NativeObject::Unwrap<WrappedScript>(args.Holder());
 		if (!n_script) {
-			isolate->ThrowException(Exception::Error(FIXED_ONE_BYTE_STRING(isolate, "Must be called as a method of Script.")));
+			isolate->ThrowException(Exception::Error(STRING_NEW(isolate, "Must be called as a method of Script.")));
 			return;
 		}
 		n_script->script_.Reset(isolate, script);

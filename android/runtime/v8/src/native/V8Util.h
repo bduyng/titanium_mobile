@@ -21,14 +21,14 @@
 	::titanium::ImmutableAsciiStringLiteral::CreateFromLiteral( \
 	isolate, string_literal, length)
 
-#define SYMBOL_LITERAL(isolate, string_literal) \
+#define NEW_SYMBOL(isolate, string_literal) \
 	v8::String::NewFromUtf8(isolate, string_literal "", v8::String::kInternalizedString)
 
-#define FIXED_ONE_BYTE_STRING(isolate, string)                                \
-  (titanium::OneByteString((isolate), (string), sizeof(string) - 1))
+#define STRING_NEW(isolate, string_literal) \
+	v8::String::NewFromUtf8(isolate, string_literal "")
 
 #define DEFINE_CONSTANT(isolate, target, name, value) \
-	(target)->Set(SYMBOL_LITERAL(isolate, name), \
+	(target)->Set(NEW_SYMBOL(isolate, name), \
 		value, static_cast<v8::PropertyAttribute>(v8::ReadOnly | v8::DontDelete))
 
 #define DEFINE_INT_CONSTANT(isolate, target, name, value) \
@@ -38,10 +38,10 @@
 	DEFINE_CONSTANT(isolate, target, name, v8:: Number::New(isolate, value))
 
 #define DEFINE_STRING_CONSTANT(isolate, target, name, value) \
-	DEFINE_CONSTANT(isolate, target, name, FIXED_ONE_BYTE_STRING(isolate, value))
+	DEFINE_CONSTANT(isolate, target, name, STRING_NEW(isolate, value))
 
 #define DEFINE_TEMPLATE(isolate, target, name, tmpl) \
-	target->Set(SYMBOL_LITERAL(isolate, name), tmpl->GetFunction())
+	target->Set(NEW_SYMBOL(isolate, name), tmpl->GetFunction())
 
 #define DEFINE_METHOD(isolate, target, name, callback) \
 	DEFINE_TEMPLATE(isolate, target, name, v8::FunctionTemplate::New(isolate, callback))
@@ -52,7 +52,7 @@
 	v8::Local<v8::Signature> __callback##_SIG = v8::Signature::New(isolate, templ); \
 	v8::Local<v8::FunctionTemplate> __callback##_TEM = \
 	v8::FunctionTemplate::New(isolate, callback, data, __callback##_SIG); \
-	templ->PrototypeTemplate()->Set(SYMBOL_LITERAL(isolate, name), \
+	templ->PrototypeTemplate()->Set(NEW_SYMBOL(isolate, name), \
 		__callback##_TEM, static_cast<v8::PropertyAttribute>(DontEnum)); \
 }
 
@@ -137,33 +137,6 @@ inline void SetTemplateMethod(v8::Isolate* isolate,
       v8::String::NewFromUtf8(isolate, name, type).ToLocalChecked();
   that->Set(name_string, function);
   function->SetName(name_string);  // NODE_SET_METHOD() compatibility.
-}
-
-inline v8::Local<v8::String> OneByteString(v8::Isolate* isolate,
-                                           const char* data,
-                                           int length) {
-  return v8::String::NewFromOneByte(isolate,
-                                    reinterpret_cast<const uint8_t*>(data),
-                                    v8::String::kNormalString,
-                                    length);
-}
-
-inline v8::Local<v8::String> OneByteString(v8::Isolate* isolate,
-                                           const signed char* data,
-                                           int length) {
-  return v8::String::NewFromOneByte(isolate,
-                                    reinterpret_cast<const uint8_t*>(data),
-                                    v8::String::kNormalString,
-                                    length);
-}
-
-inline v8::Local<v8::String> OneByteString(v8::Isolate* isolate,
-                                           const unsigned char* data,
-                                           int length) {
-  return v8::String::NewFromOneByte(isolate,
-                                    reinterpret_cast<const uint8_t*>(data),
-                                    v8::String::kNormalString,
-                                    length);
 }
 
 class ImmutableAsciiStringLiteral: public v8::String::ExternalOneByteStringResource

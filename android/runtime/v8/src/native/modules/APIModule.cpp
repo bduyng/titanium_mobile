@@ -43,7 +43,7 @@ void APIModule::Initialize(Local<Object> target, Local<Context> context)
 	Isolate* isolate = context->GetIsolate();
 	HandleScope scope(isolate);
 	Local<FunctionTemplate> constructor = FunctionTemplate::New(isolate);
-	constructor->SetClassName(FIXED_ONE_BYTE_STRING(isolate, "API"));
+	constructor->SetClassName(NEW_SYMBOL(isolate, "API"));
 	constructorTemplate.Reset(isolate, constructor);
 
 	SetProtoMethod(isolate, constructor, "debug", logDebug);
@@ -59,7 +59,7 @@ void APIModule::Initialize(Local<Object> target, Local<Context> context)
 	SetProtoMethod(isolate, constructor, "getApiName", APIModule::getApiName);
 
 	Local<ObjectTemplate> instanceTemplate = constructor->InstanceTemplate();
-	instanceTemplate->SetAccessor(FIXED_ONE_BYTE_STRING(isolate, "apiName"), APIModule::getter_apiName);
+	instanceTemplate->SetAccessor(NEW_SYMBOL(isolate, "apiName"), APIModule::getter_apiName);
 
 	// Expose a method for terminating the application for the debugger.
 	// Debugger will send an evaluation request calling this method
@@ -71,7 +71,7 @@ void APIModule::Initialize(Local<Object> target, Local<Context> context)
 
 	constructor->Inherit(KrollModule::proxyTemplate.Get(isolate));
 
-	target->Set(FIXED_ONE_BYTE_STRING(isolate, "API"),
+	target->Set(NEW_SYMBOL(isolate, "API"),
                 constructor->GetFunction()->NewInstance());
 }
 
@@ -200,16 +200,16 @@ void APIModule::log(const FunctionCallbackInfo<Value>& args)
 			APIModule::logInternal(LOG_LEVEL_FATAL, LCAT, *message);
 		} else {
 			int size = strlen(*level) + strlen(*message) + 4;
-			
+
 			char *fmessage = new char[size];
 			snprintf(fmessage, size, "[%s] %s", *level, *message);
-	
+
 			APIModule::logInternal(LOG_LEVEL_INFO, LCAT, fmessage);
 			delete [] fmessage;
 		}
 	}
 }
-                              
+
 Local<String> APIModule::combineLogMessages(const FunctionCallbackInfo<Value>& args, int startIndex)
 {
     // Unfortunately there is no really reasonable way to do this in a memory
@@ -218,23 +218,23 @@ Local<String> APIModule::combineLogMessages(const FunctionCallbackInfo<Value>& a
     // do in JS. Requiring the whitespace between arguments complicates matters
     // by introducing the " " token.
     Isolate* isolate = args.GetIsolate();
-    Local<String> space = SYMBOL_LITERAL(isolate, " ");
+    Local<String> space = NEW_SYMBOL(isolate, " ");
     Local<String> message = String::Empty(isolate);
     for (int i=startIndex; i < args.Length(); i++) {
         message = String::Concat(message, String::Concat(space, args[i]->ToString(isolate)));
     }
-    
+
     return message;
 }
 
 void APIModule::getApiName(const FunctionCallbackInfo<Value>& args)
 {
-	args.GetReturnValue().Set(FIXED_ONE_BYTE_STRING(args.GetIsolate(), "Ti.API"));
+	args.GetReturnValue().Set(STRING_NEW(args.GetIsolate(), "Ti.API"));
 }
 
 void APIModule::getter_apiName(Local<Name> name, const PropertyCallbackInfo<Value>& args)
 {
-	args.GetReturnValue().Set(FIXED_ONE_BYTE_STRING(args.GetIsolate(), "Ti.API"));
+	args.GetReturnValue().Set(STRING_NEW(args.GetIsolate(), "Ti.API"));
 }
 
 void APIModule::terminate(const FunctionCallbackInfo<Value>& args)

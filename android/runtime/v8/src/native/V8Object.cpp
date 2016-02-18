@@ -99,17 +99,17 @@ Java_org_appcelerator_kroll_runtime_v8_V8Object_nativeFireEvent
 
 	Local<Object> jsData = TypeConverter::javaHashMapToJsValue(V8Runtime::v8_isolate, env, data);
 
-	jsData->Set(SYMBOL_LITERAL(V8Runtime::v8_isolate, "bubbles"), TypeConverter::javaBooleanToJsBoolean(V8Runtime::v8_isolate, bubble));
+	jsData->Set(NEW_SYMBOL(V8Runtime::v8_isolate, "bubbles"), TypeConverter::javaBooleanToJsBoolean(V8Runtime::v8_isolate, bubble));
 
-	jsData->Set(SYMBOL_LITERAL(V8Runtime::v8_isolate, "source"), source);
+	jsData->Set(NEW_SYMBOL(V8Runtime::v8_isolate, "source"), source);
 
 	if (reportSuccess || code != 0) {
-		jsData->Set(SYMBOL_LITERAL(V8Runtime::v8_isolate, "success"), TypeConverter::javaBooleanToJsBoolean(V8Runtime::v8_isolate, code == 0));
-		jsData->Set(SYMBOL_LITERAL(V8Runtime::v8_isolate, "code"), TypeConverter::javaIntToJsNumber(V8Runtime::v8_isolate, code));
+		jsData->Set(NEW_SYMBOL(V8Runtime::v8_isolate, "success"), TypeConverter::javaBooleanToJsBoolean(V8Runtime::v8_isolate, code == 0));
+		jsData->Set(NEW_SYMBOL(V8Runtime::v8_isolate, "code"), TypeConverter::javaIntToJsNumber(V8Runtime::v8_isolate, code));
 	}
-	
+
 	if (errorMessage != NULL) {
-		jsData->Set(SYMBOL_LITERAL(V8Runtime::v8_isolate, "error"), TypeConverter::javaStringToJsString(V8Runtime::v8_isolate, env, errorMessage));
+		jsData->Set(NEW_SYMBOL(V8Runtime::v8_isolate, "error"), TypeConverter::javaStringToJsString(V8Runtime::v8_isolate, env, errorMessage));
 	}
 
 	Local<Value> result;
@@ -197,7 +197,7 @@ Java_org_appcelerator_kroll_runtime_v8_V8Object_nativeSetWindow
 		jsKrollWindow = TypeConverter::javaObjectToJsValue(V8Runtime::v8_isolate, env, javaKrollWindow)->ToObject();
 	}
 
-	Local<Value> setWindowValue = jsKrollWindow->Get(FIXED_ONE_BYTE_STRING(V8Runtime::v8_isolate, "setWindow"));
+	Local<Value> setWindowValue = jsKrollWindow->Get(STRING_NEW(V8Runtime::v8_isolate, "setWindow"));
 	if (!setWindowValue->IsFunction()) {
 		return;
 	}

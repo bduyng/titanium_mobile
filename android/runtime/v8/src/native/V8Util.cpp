@@ -87,8 +87,8 @@ void V8Util::reportException(Isolate* isolate, TryCatch &tryCatch, bool showLine
 	Local<Message> message = tryCatch.Message();
 
 	if (nameSymbol.IsEmpty()) {
-		nameSymbol.Reset(isolate, SYMBOL_LITERAL(isolate, "name"));
-		messageSymbol.Reset(isolate, SYMBOL_LITERAL(isolate, "message"));
+		nameSymbol.Reset(isolate, NEW_SYMBOL(isolate, "name"));
+		messageSymbol.Reset(isolate, NEW_SYMBOL(isolate, "message"));
 	}
 
 	if (showLine) {
@@ -173,13 +173,13 @@ Local<String> V8Util::jsonStringify(Isolate* isolate, Local<Value> value)
 {
 	HandleScope scope(isolate);
 
-	Local<Object> json = isolate->GetCurrentContext()->Global()->Get(FIXED_ONE_BYTE_STRING(isolate, "JSON"))->ToObject(isolate);
-	Local<Function> stringify = Local<Function>::Cast(json->Get(FIXED_ONE_BYTE_STRING(isolate, "stringify")));
+	Local<Object> json = isolate->GetCurrentContext()->Global()->Get(STRING_NEW(isolate, "JSON"))->ToObject(isolate);
+	Local<Function> stringify = Local<Function>::Cast(json->Get(STRING_NEW(isolate, "stringify")));
 	Local<Value> args[] = { value };
 	Local<Value> result = stringify->Call(json, 1, args);
     if (result.IsEmpty()) {
         LOGE(TAG, "!!!! JSON.stringify() result is null/undefined.!!!");
-        return FIXED_ONE_BYTE_STRING(isolate, "ERROR");
+        return STRING_NEW(isolate, "ERROR");
     } else {
         return result->ToString(isolate);
     }
@@ -200,7 +200,7 @@ bool V8Util::isNaN(Isolate* isolate, Local<Value> value)
 	Local<Object> global = isolate->GetCurrentContext()->Global();
 
 	if (isNaNFunction.IsEmpty()) {
-		Local<Value> isNaNValue = global->Get(SYMBOL_LITERAL(isolate, "isNaN"));
+		Local<Value> isNaNValue = global->Get(NEW_SYMBOL(isolate, "isNaN"));
 		isNaNFunction.Reset(isolate, isNaNValue.As<Function>());
 	}
 

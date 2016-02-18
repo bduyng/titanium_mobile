@@ -18,5 +18,5 @@ endif
 
 
 TARGET_DEVICE := device
-APP_OPTIM := release
+APP_OPTIM := debug
 TI_DEBUG := 1

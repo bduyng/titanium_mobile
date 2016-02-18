@@ -53,7 +53,7 @@ void ${className}::bindProxy(Local<Object> exports, Local<Context> context)
 {
 	Isolate* isolate = context->GetIsolate();
 	// use symbol over string for efficiency
-	Local<String> nameSymbol = SYMBOL_LITERAL(isolate, "${proxyAttrs.name}");
+	Local<String> nameSymbol = NEW_SYMBOL(isolate, "${proxyAttrs.name}");
 	Local<FunctionTemplate> pt = getProxyTemplate(isolate);
 	Local<Function> proxyConstructor = pt->GetFunction();
 	<#if isModule>
@@ -89,7 +89,7 @@ Local<FunctionTemplate> ${className}::getProxyTemplate(Isolate* isolate)
 	EscapableHandleScope scope(isolate);
 
 	// use symbol over string for efficiency
-	Local<String> nameSymbol = SYMBOL_LITERAL(isolate, "${proxyAttrs.name}");
+	Local<String> nameSymbol = NEW_SYMBOL(isolate, "${proxyAttrs.name}");
 
 	Local<FunctionTemplate> t = titanium::Proxy::inheritProxyTemplate(isolate,
 	<#if superProxyClassName??>
@@ -177,7 +177,7 @@ Local<FunctionTemplate> ${className}::getProxyTemplate(Isolate* isolate)
 
 	// Dynamic properties -----------------------------------------------------
 	<@Proxy.listDynamicProperties ; isFirst, name, property, getSignature, setSignature>
-	instanceTemplate->SetAccessor(SYMBOL_LITERAL(isolate, "${name}"),
+	instanceTemplate->SetAccessor(NEW_SYMBOL(isolate, "${name}"),
 		<#if property.get>
 			${className}::getter_${name}
 		<#else>
@@ -193,12 +193,12 @@ Local<FunctionTemplate> ${className}::getProxyTemplate(Isolate* isolate)
 	// Accessors --------------------------------------------------------------
 	<@Proxy.listPropertyAccessors ; isFirst, name, getter, setter>
 	instanceTemplate->SetAccessor(
-		SYMBOL_LITERAL(isolate, "${name}"),
+		NEW_SYMBOL(isolate, "${name}"),
 		titanium::Proxy::getProperty,
 		titanium::Proxy::onPropertyChanged,
 		Local<Value>(), DEFAULT);
-	DEFINE_PROTOTYPE_METHOD_DATA(isolate, t, "${getter}", titanium::Proxy::getProperty, SYMBOL_LITERAL(isolate, "${name}"));
-	DEFINE_PROTOTYPE_METHOD_DATA(isolate, t, "${setter}", titanium::Proxy::onPropertyChanged, SYMBOL_LITERAL(isolate, "${name}"));
+	DEFINE_PROTOTYPE_METHOD_DATA(isolate, t, "${getter}", titanium::Proxy::getProperty, NEW_SYMBOL(isolate, "${name}"));
+	DEFINE_PROTOTYPE_METHOD_DATA(isolate, t, "${setter}", titanium::Proxy::onPropertyChanged, NEW_SYMBOL(isolate, "${name}"));
 	</@Proxy.listPropertyAccessors>
 
 	<#if interceptor??>

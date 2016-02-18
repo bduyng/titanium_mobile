@@ -102,7 +102,7 @@ static void krollLog(const FunctionCallbackInfo<Value>& args)
 
 	Local<String> tag = args[0]->ToString(isolate);
 	Local<String> message = args[1]->ToString(isolate);
-	Local<String> space = FIXED_ONE_BYTE_STRING(isolate, " ");
+	Local<String> space = STRING_NEW(isolate, " ");
 	for (uint32_t i = 2; i < len; ++i) {
 		message = String::Concat(String::Concat(message, space), args[i]->ToString(isolate));
 	}
@@ -128,16 +128,16 @@ void V8Runtime::bootstrap(Local<Context> context)
 	SetMethod(isolate, global, "log", krollLog);
 	// Move this into the EventEmitter::initTemplate call?
 	Local<FunctionTemplate> eect = Local<FunctionTemplate>::New(isolate, EventEmitter::constructorTemplate);
-	global->Set(FIXED_ONE_BYTE_STRING(isolate, "EventEmitter"), eect->GetFunction());
+	global->Set(NEW_SYMBOL(isolate, "EventEmitter"), eect->GetFunction());
 
-	global->Set(SYMBOL_LITERAL(isolate, "runtime"), FIXED_ONE_BYTE_STRING(isolate, "v8"));
-	global->Set(SYMBOL_LITERAL(isolate, "DBG"), v8::Boolean::New(isolate, V8Runtime::DBG));
-	global->Set(SYMBOL_LITERAL(isolate, "moduleContexts"), mc);
+	global->Set(NEW_SYMBOL(isolate, "runtime"), STRING_NEW(isolate, "v8"));
+	global->Set(NEW_SYMBOL(isolate, "DBG"), v8::Boolean::New(isolate, V8Runtime::DBG));
+	global->Set(NEW_SYMBOL(isolate, "moduleContexts"), mc);
 
 	LOG_TIMER(TAG, "Executing kroll.js");
 
 	TryCatch tryCatch;
-	Local<Value> result = V8Util::executeString(isolate, KrollBindings::getMainSource(isolate), FIXED_ONE_BYTE_STRING(isolate, "ti:/kroll.js"));
+	Local<Value> result = V8Util::executeString(isolate, KrollBindings::getMainSource(isolate), STRING_NEW(isolate, "ti:/kroll.js"));
 
 	if (tryCatch.HasCaught()) {
 		V8Util::reportException(isolate, tryCatch, true);
@@ -263,11 +263,11 @@ JNIEXPORT void JNICALL Java_org_appcelerator_kroll_runtime_v8_V8Runtime_nativeRu
 	titanium::JNIScope jniScope(env);
 
 	if (V8Runtime::moduleObject.IsEmpty()) {
-		Local<Object> module = V8Runtime::Global()->Get(FIXED_ONE_BYTE_STRING(V8Runtime::v8_isolate, "Module"))->ToObject(V8Runtime::v8_isolate);
+		Local<Object> module = V8Runtime::Global()->Get(STRING_NEW(V8Runtime::v8_isolate, "Module"))->ToObject(V8Runtime::v8_isolate);
 		V8Runtime::moduleObject.Reset(V8Runtime::v8_isolate, module);
 
 		V8Runtime::runModuleFunction.Reset(V8Runtime::v8_isolate,
-			Local<Function>::Cast(module->Get(FIXED_ONE_BYTE_STRING(V8Runtime::v8_isolate, "runModule"))));
+			Local<Function>::Cast(module->Get(STRING_NEW(V8Runtime::v8_isolate, "runModule"))));
 	}
 
 	Local<Value> jsSource = TypeConverter::javaStringToJsString(V8Runtime::v8_isolate, env, source);
