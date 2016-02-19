@@ -149,7 +149,7 @@ void V8Runtime::bootstrap(Local<Context> context)
 
 	Local<Function> mainFunction = Local<Function>::Cast(result);
 	Local<Value> args[] = { global };
-	mainFunction->Call(global, 1, args);
+	mainFunction->Call(context->Global(), 1, args);
 
 	if (tryCatch.HasCaught()) {
 		V8Util::reportException(isolate, tryCatch, true);
